@@ -3,7 +3,7 @@ import re
 import pdb
 
 inline_pat = re.compile("([=#:])?([^=#:\]]+)")
-FrameHead = ["Class", "Inidvidual", "ObjectProperty", "DataProperty"]
+FrameHead = ["Class", "Individual", "ObjectProperty", "DataProperty"]
 
 logger = logging.getLogger(__name__)
 sh = logging.StreamHandler()
@@ -78,11 +78,13 @@ class KabelParser:
             self.inlineList.append(oriText)
 
     def linkIndividuals(self):
+        
         for blockIdx, blockHead in enumerate(self.blockNames):
             blockLines = self.blockList[blockIdx]
+            
             if blockHead == "Individual":
-                hasExpanded, expLines = self.expandIdvFrame(blockLines)
-                self.blockList[blockIdx] = expLines
+                expLines = self.expandIdvFrame(blockLines)
+                self.blockList[blockIdx] = expLines                
             elif blockHead == "Class":
                 pass
             elif blockHead == "ObjectProperty":
@@ -94,33 +96,40 @@ class KabelParser:
 
         for idvName in self.inlineList:
             hasExpanded = self.idvMap[idvName].get("hasExpanded", False)
+            
             if not hasExpanded:
                 idvObj = self.idvMap[idvName]                
                 blockStr = ["\nIndividual: " + idvObj["name"]]
                 if idvObj["type"]:
                     blockStr.append("  Type: " + idvObj["type"])
-                self.blockList.append(blockStr)                    
+                self.blockList.append(blockStr)                                  
+        
 
     def expandIdvFrame(self, lines):
         expLines = []
         ln0 = lines[0]
         idvName = ln0[ln0.find(":")+1:].strip()
-        idvObj = self.idvMap.get(idvName, None)
+        idvObj = None
+        for idvObj_x in self.idvMap.values():            
+            if idvObj_x["name"] == idvName or \
+               idvObj_x["alias"] == idvName:
+                idvObj = idvObj_x
+                break
         
-        if idvObj:
+        if idvObj:            
             ln0 = ln0.replace(idvName, idvObj["name"])
-            expLines.append(ln0)
+            expLines.append(ln0)            
             expLines += lines[1:]
             
             if idvObj.get("type", ""):
                 expLines.append("  Type: %s" % idvObj["type"])
             idvObj["hasExpanded"] = True
         else:
-            idvObj["hasExpanded"] = False
+            expLines = lines
 
         return expLines
 
-    def write(self, fobj):
+    def write(self, fobj):        
         for block in self.blockList:
             blockStr = "\n".join(block)
             fobj.write(blockStr)
