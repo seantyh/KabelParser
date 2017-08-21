@@ -1,0 +1,12 @@
+Prefix: : <http://www.kyle.com.tw/kor/curriculum/>
+Ontology: <http://www.kyle.com.tw/kor/curriculum/basic-ontology>
+Class: Text
+Class: Concept
+Class Constraint
+
+ObjectProperty: hasConcept
+  Range: Concept
+
+ObjectProperty: hasConstraint
+  Domain: Concept
+  Range: Constraint
