@@ -39,6 +39,11 @@ class KabelParser:
             self.state["blockHead"] = lineHead
 
         # store current line into self.blockBuf
+        if lineHead not in FrameHead:
+            blockStr = "  " + blockStr
+        else:
+            blockStr = "\n" + blockStr
+
         self.blockBuf.append(blockStr)        
         
     def parseInline(self, inlineStr):
@@ -48,7 +53,7 @@ class KabelParser:
             return
         oriText = mList[0][1]
 
-        idvType = ""; idvAlias = ""; idvName = ""
+        idvType = ""; idvAlias = ""; idvName = oriText
         if len(mList) > 1:
             logger.debug("mList.groups: %s", mList)
             for m in mList[1:]:
@@ -90,10 +95,11 @@ class KabelParser:
         for idvName in self.inlineList:
             hasExpanded = self.idvMap[idvName].get("hasExpanded", False)
             if not hasExpanded:
-                idvObj = self.idvMap[idvName]
-                self.blockList.append(
-                    ["Individual: " + idvObj["name"],
-                     "  Type: " + idvObj["type"]])
+                idvObj = self.idvMap[idvName]                
+                blockStr = ["\nIndividual: " + idvObj["name"]]
+                if idvObj["type"]:
+                    blockStr.append("  Type: " + idvObj["type"])
+                self.blockList.append(blockStr)                    
 
     def expandIdvFrame(self, lines):
         expLines = []
