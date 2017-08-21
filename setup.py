@@ -6,5 +6,6 @@ setup(name="KabelParser",
       url="https://github.com/seantyh/KabelParser.git",
       author="Sean Tseng",
       license="GNUv3",
+      test_suite="tests",
       packages=["KabelParser"],
       zip_safe=False)

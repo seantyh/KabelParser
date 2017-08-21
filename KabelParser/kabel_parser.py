@@ -8,7 +8,7 @@ FrameHead = ["Class", "Individual", "ObjectProperty", "DataProperty"]
 logger = logging.getLogger(__name__)
 sh = logging.StreamHandler()
 logger.addHandler(sh)
-logger.setLevel("DEBUG")
+# logger.setLevel("DEBUG")
 
 class KabelParser:
     def __init__(self):
