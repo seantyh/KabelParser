@@ -1,16 +1,16 @@
-import sys
 import re
-from kabel_parser import KabelParser
+import io
+from .kabel_parser import KabelParser
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("kabel.py <input file.kabel.txt>")
-        exit()
-    inkabel = sys.argv[1]
-    outkabel = inkabel.replace(".kabel.txt", ".owl")
-    fin = open(inkabel, "r", encoding="UTF-8")
-    in_lines = list(fin.readlines())
-    parser = KabelParser()
+def parseFile(fpath):
+    fin = open(fpath, "r", encoding="UTF-8")
+    intext = fin.read()
+    fin.close()
+    return parse(intext)
+
+def parse(textStr):
+    in_lines = textStr.split("\n")
+    parser = KabelParser()    
     patBracket = re.compile("\[(.*?)\]")
     for ln in in_lines:        
         if ln.startswith("//#"):
@@ -19,11 +19,13 @@ if __name__ == "__main__":
             mList = patBracket.findall(ln)
             for idvBracket in mList:
                 parser.parseInline(idvBracket)
-    fin.close()
 
     parser.documentEnd()
 
-    fout = open(outkabel, "w", encoding="UTF-8")    
+    fout = io.StringIO()
     parser.write(fout)
+    owl = fout.getvalue()
     fout.close()
+
+    return owl
 
